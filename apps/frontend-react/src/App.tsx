@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { logger } from './logger.ts'
 
 type Book = {
   id: number
@@ -14,14 +15,26 @@ type State =
 
 // Fetches the books and resolves to the next UI state; never throws.
 async function loadBooks(): Promise<State> {
+  logger.debug('fetching books')
+  const start = performance.now()
+  let status: number | undefined
   try {
     const response = await fetch('/api/books')
+    status = response.status
     if (!response.ok) {
       throw new Error(`GET /api/books failed with HTTP ${response.status}`)
     }
     const books = (await response.json()) as Book[]
+    logger.info(
+      { count: books.length, duration_ms: Math.round(performance.now() - start) },
+      'books fetched',
+    )
     return { status: 'success', books }
   } catch (error) {
+    logger.error(
+      { err: error, status, duration_ms: Math.round(performance.now() - start) },
+      'failed to fetch books',
+    )
     return {
       status: 'error',
       message: error instanceof Error ? error.message : String(error),

@@ -5,6 +5,7 @@ services:
     build: ./apps/backend-express
     environment:
       PORT: 3000
+      LOG_LEVEL: info
     ports:
       - "3000:3000"
     healthcheck:
