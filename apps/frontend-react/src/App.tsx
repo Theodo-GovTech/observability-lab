@@ -68,6 +68,15 @@ function App() {
         <button onClick={() => void refresh()} disabled={state.status === 'loading'}>
           Refresh
         </button>
+        {/* TEMP: Sentry setup check, remove after verification */}
+        <button
+          type="button"
+          onClick={() => {
+            throw new Error(`Sentry test error ${Date.now()}`)
+          }}
+        >
+          Sentry test error
+        </button>
       </header>
 
       {state.status === 'loading' && <p className="status">Loading…</p>}
