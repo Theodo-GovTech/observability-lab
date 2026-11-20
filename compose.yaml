@@ -1,0 +1,23 @@
+name: observability-lab
+
+services:
+  backend-express:
+    build: ./apps/backend-express
+    environment:
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  frontend-react:
+    build: ./apps/frontend-react
+    ports:
+      - "8080:80"
+    depends_on:
+      backend-express:
+        condition: service_healthy
