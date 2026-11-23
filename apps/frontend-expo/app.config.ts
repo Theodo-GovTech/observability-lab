@@ -11,8 +11,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: 'frontend-expo',
   ios: {
     supportsTablet: true,
+    bundleIdentifier: 'com.observabilitylab.frontendexpo',
   },
   android: {
+    package: 'com.observabilitylab.frontendexpo',
     adaptiveIcon: {
       backgroundColor: '#E6F4FE',
       foregroundImage: './assets/android-icon-foreground.png',

@@ -14,11 +14,11 @@ browser ──► frontend-react (nginx :8080) ──/api/*──► backend-exp
                                                       GET /health
 ```
 
-| App                    | Stack                                                              | Notes                                                                                                 |
-| ---------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| `apps/frontend-react`  | React 19, TypeScript, Vite (`react-ts` template)                   | Production build served by nginx, which proxies `/api/` to the backend (same origin, no CORS)         |
-| `apps/backend-express` | Node 24, Express 5, TypeScript (ESM)                               | Single endpoint returning books from memory, graceful shutdown on `SIGTERM`                           |
-| `apps/frontend-expo`   | Expo SDK 58, React Native, Expo Router, TanStack Query, axios, zod | Mobile app, runs in Expo Go (no native build). Calls the backend directly, not through docker compose |
+| App                    | Stack                                                              | Notes                                                                                                          |
+| ---------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `apps/frontend-react`  | React 19, TypeScript, Vite (`react-ts` template)                   | Production build served by nginx, which proxies `/api/` to the backend (same origin, no CORS)                  |
+| `apps/backend-express` | Node 24, Express 5, TypeScript (ESM)                               | Single endpoint returning books from memory, graceful shutdown on `SIGTERM`                                    |
+| `apps/frontend-expo`   | Expo SDK 58, React Native, Expo Router, TanStack Query, axios, zod | Mobile app, runs in Expo Go or as a local native build. Calls the backend directly, not through docker compose |
 
 Apps are named `(frontend|backend)-<stack>` so that equivalent apps in other stacks can be added
 side by side to compare instrumentation across languages.
@@ -43,6 +43,27 @@ cd apps/backend-express && bun install && bun run dev   # http://localhost:3000
 cd apps/frontend-react  && bun install && bun run dev   # http://localhost:5173, proxies /api to :3000
 cd apps/frontend-expo   && bun install && bun run start # scan the QR code with Expo Go, or press i / a for a simulator
 ```
+
+### Native builds (Expo app)
+
+`apps/frontend-expo` uses [continuous native generation](https://docs.expo.dev/workflow/continuous-native-generation/):
+`ios/` and `android/` are generated from `app.config.ts` and are not committed. Builds run locally only (no EAS).
+
+Requires Xcode + CocoaPods for iOS, and Android Studio (SDK, `ANDROID_HOME` set) + JDK 17 for Android.
+
+```sh
+cd apps/frontend-expo
+bun run prebuild          # generate ios/ and android/ (bun run prebuild:clean to regenerate from scratch)
+bun run ios               # build a debug dev client, install it on a simulator, start Metro
+bun run android           # same on an Android emulator
+bun run ios:device        # pick a connected iPhone (needs a signing team set in Xcode)
+bun run android:device    # pick a connected Android phone
+bun run ios:release       # release build, JS bundled in the app (no Metro)
+bun run android:release   # release build, signed with the debug keystore
+```
+
+Once the dev client is installed, `bun run start` serves it; use `bun run start:go` to keep using Expo Go.
+Re-run `bun run prebuild:clean` after changing `app.config.ts` or adding a package with native code.
 
 ## Logging
 
