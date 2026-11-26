@@ -44,6 +44,8 @@ cd apps/frontend-react  && bun install && bun run dev   # http://localhost:5173,
 cd apps/frontend-expo   && bun install && bun run start # scan the QR code with Expo Go, or press i / a for a simulator
 ```
 
+New to mobile development? See [apps/frontend-expo/README.md](apps/frontend-expo/README.md) to set up your environment.
+
 ### Native builds (Expo app)
 
 `apps/frontend-expo` uses [continuous native generation](https://docs.expo.dev/workflow/continuous-native-generation/):
